@@ -51,15 +51,39 @@ class Album
     return artist
   end
 
-  # def customer
-  #   sql = "SELECT * FROM customers
-  #         WHERE id = $1"
-  #   values = [@customer_id]
-  #   results = SqlRunner.run(sql, values)
-  #   customer_data = results[0]
-  #   customer = Customer.new(customer_data)
-  #   return customer
-  # end
+  def update
+    sql =
+    "UPDATE albums
+    SET (
+      title,
+      genre,
+      artist_id
+    ) =
+    (
+      $1, $2, $3
+    )
+    WHERE id = $4
+      RETURNING *
+    "
+    values = [@title, @genre, @artist_id, @id]
+    result = SqlRunner.run(sql, values)
+    updated_album = Album.new(result[0])
+    return updated_album
+  end
 
+  def delete
+    sql = "DELETE FROM albums WHERE id = $1"
+    values = [@id]
+    SqlRunner.run(sql, values)
+  end
+
+  def find_by_id
+    sql = "SELECT * FROM albums
+    WHERE id = $1"
+    values = [@id]
+    result = SqlRunner.run(sql, values)
+    found_album = Album.new(result[0])
+    return found_album
+  end
 
 end
